@@ -31,3 +31,4 @@ jobs:
             release
             deps
             ci
+            docs
