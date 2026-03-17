@@ -69,7 +69,7 @@
     "@nestjs/event-emitter": "^2",
     "@nestjs/microservices": "^10",
     "@nestjs/terminus": "^11",
-    "@nestjs/testing": "^10",
+    "@nestjs/testing": "^11",
     "@schematics/angular": "^17.3.10",
     "@semantic-release/changelog": "^6.0.0",
     "@semantic-release/commit-analyzer": "^9.0.0",
