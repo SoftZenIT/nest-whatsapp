@@ -17,7 +17,7 @@
     "class-validator": "^0.14.1"
   },
   "devDependencies": {
-    "@nestjs/cli": "^10.4.5",
+    "@nestjs/cli": "^11.0.16",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.2"
