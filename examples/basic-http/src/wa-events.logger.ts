@@ -1,5 +1,5 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { WhatsAppEvents } from '@sadjous/nest-whatsapp';
+import { WhatsAppEvents } from '@SoftZenIT/nest-whatsapp';
 
 @Injectable()
 export class WaEventsLogger implements OnModuleInit {

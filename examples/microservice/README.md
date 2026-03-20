@@ -1,6 +1,6 @@
 # Microservice Example
 
-A NestJS microservice using `@sadjous/nest-whatsapp` TCP client.
+A NestJS microservice using `@SoftZenIT/nest-whatsapp` TCP client.
 
 ## Setup
 
@@ -58,7 +58,7 @@ export class WaClientService {
 
 ```ts
 import { Module } from '@nestjs/common';
-import { WhatsAppModule, WhatsAppHealthIndicator } from '@sadjous/nest-whatsapp';
+import { WhatsAppModule, WhatsAppHealthIndicator } from '@SoftZenIT/nest-whatsapp';
 import { HealthCheckService, HealthCheck } from '@nestjs/terminus';
 import { Controller, Get } from '@nestjs/common';
 
