@@ -67,7 +67,7 @@
     "@nestjs/config": ">=3 <5",
     "@nestjs/core": "^10",
     "@nestjs/event-emitter": "^2",
-    "@nestjs/microservices": "^10",
+    "@nestjs/microservices": "^11",
     "@nestjs/terminus": "^11",
     "@nestjs/testing": "^10",
     "@schematics/angular": "^17.3.10",
@@ -103,7 +103,7 @@
     "@nestjs/config": ">=3 <5",
     "@nestjs/core": "^10",
     "@nestjs/event-emitter": "^2",
-    "@nestjs/microservices": "^10",
+    "@nestjs/microservices": "^11",
     "@nestjs/terminus": "^11"
   },
   "peerDependenciesMeta": {
