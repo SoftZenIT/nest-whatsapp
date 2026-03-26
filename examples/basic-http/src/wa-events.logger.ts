@@ -14,11 +14,13 @@ export class WaEventsLogger implements OnModuleInit {
       this.logger.log(`Image from ${contact?.wa_id ?? 'unknown'}: ${message.image.link}`);
     });
     this.events.onVideoReceived(({ message, contact }) => {
-      this.logger.log(`Video from ${contact?.wa_id ?? 'unknown'}: id=${message.video.id ?? 'n/a'}`);
+      this.logger.log(
+        `Video from ${contact?.wa_id ?? 'unknown'}: link=${message.video.link ?? 'n/a'}`
+      );
     });
     this.events.onStickerReceived(({ message, contact }) => {
       this.logger.log(
-        `Sticker from ${contact?.wa_id ?? 'unknown'}: id=${message.sticker.id ?? 'n/a'}`
+        `Sticker from ${contact?.wa_id ?? 'unknown'}: link=${message.sticker.link ?? 'n/a'}`
       );
     });
     this.events.onInteractiveReceived(({ message, contact }) => {
@@ -47,7 +49,7 @@ export class WaEventsLogger implements OnModuleInit {
     });
     this.events.onReferralReceived(({ referral, contact }) => {
       this.logger.log(
-        `Referral (ad click) from ${contact?.wa_id ?? 'unknown'}: "${referral.headline}" — ${referral.source_url}`
+        `Referral (ad click) from ${contact?.wa_id ?? 'unknown'}: "${referral.headline}" — ${referral.sourceUrl}`
       );
     });
   }
