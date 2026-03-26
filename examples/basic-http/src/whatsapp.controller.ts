@@ -1,33 +1,34 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode } from '@nestjs/common';
 import { WhatsAppService } from 'nest-whatsapp';
 import type { WhatsAppMode } from '../../../src/interfaces/whatsapp-client-options.interface';
+import type { WhatsAppContactCard } from '../../../src/interfaces/webhook.interfaces';
 
 @Controller('messages')
 export class WhatsAppController {
   constructor(private readonly wa: WhatsAppService) {}
 
+  private get mode(): WhatsAppMode {
+    return process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live';
+  }
+
   @Post('text')
   sendText(@Body() body: { to: string; message: string }) {
-    const mode: WhatsAppMode = process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live';
-    return this.wa.sendText(body.to, body.message, mode);
+    return this.wa.sendText(body.to, body.message, this.mode);
   }
 
   @Post('media')
   sendMedia(@Body() body: { to: string; url: string; caption?: string }) {
-    const mode: WhatsAppMode = process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live';
-    return this.wa.sendMedia(body.to, body.url, body.caption ?? '', mode);
+    return this.wa.sendMedia(body.to, body.url, body.caption ?? '', this.mode);
   }
 
   @Post('audio')
   sendAudio(@Body() body: { to: string; url: string }) {
-    const mode: WhatsAppMode = process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live';
-    return this.wa.sendAudio(body.to, body.url, mode);
+    return this.wa.sendAudio(body.to, body.url, this.mode);
   }
 
   @Post('document')
   sendDocument(@Body() body: { to: string; url: string; filename?: string }) {
-    const mode: WhatsAppMode = process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live';
-    return this.wa.sendDocument(body.to, body.url, body.filename ?? 'document', mode);
+    return this.wa.sendDocument(body.to, body.url, body.filename ?? 'document', this.mode);
   }
 
   @Post('location')
@@ -41,32 +42,48 @@ export class WhatsAppController {
       address?: string;
     }
   ) {
-    const mode: WhatsAppMode = process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live';
     return this.wa.sendLocation(
       body.to,
       Number(body.latitude),
       Number(body.longitude),
       body.name ?? '',
       body.address ?? '',
-      mode
+      this.mode
     );
   }
 
   @Post('template')
   sendTemplate(@Body() body: { to: string; templateName: string; variables?: string[] }) {
-    const mode: WhatsAppMode = process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live';
-    return this.wa.sendTemplate(body.to, body.templateName, body.variables ?? [], mode);
+    return this.wa.sendTemplate(body.to, body.templateName, body.variables ?? [], this.mode);
+  }
+
+  /**
+   * Send a contact card.
+   * Body: { to, contacts: WhatsAppContactCard[] }
+   */
+  @Post('contact')
+  sendContact(@Body() body: { to: string; contacts: WhatsAppContactCard[] }) {
+    return this.wa.sendContact(body.to, body.contacts, this.mode);
+  }
+
+  /**
+   * Mark a message as read.
+   * Body: { messageId }
+   */
+  @Post('read')
+  @HttpCode(200)
+  async markAsRead(@Body() body: { messageId: string }) {
+    await this.wa.markAsRead(body.messageId, this.mode);
+    return { ok: true };
   }
 
   @Post('start-session')
   startSession(@Body() body: { to: string }) {
-    const mode: WhatsAppMode = process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live';
-    return this.wa.startSession(body.to, mode);
+    return this.wa.startSession(body.to, this.mode);
   }
 
   @Post('end-session')
   endSession(@Body() body: { to: string }) {
-    const mode: WhatsAppMode = process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live';
-    return this.wa.endSession(body.to, mode);
+    return this.wa.endSession(body.to, this.mode);
   }
 }

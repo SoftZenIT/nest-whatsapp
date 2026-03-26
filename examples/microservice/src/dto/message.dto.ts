@@ -10,6 +10,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import type { WhatsAppMode } from '../../../src/interfaces/whatsapp-client-options.interface';
+import type { WhatsAppContactCard } from '../../../src/interfaces/webhook.interfaces';
 
 class BaseSendDto {
   @IsString()
@@ -76,4 +77,20 @@ export class SendLocationDto extends BaseSendDto {
   @IsString()
   @IsNotEmpty()
   address!: string;
+}
+
+export class SendContactDto extends BaseSendDto {
+  @IsArray()
+  @ArrayNotEmpty()
+  contacts!: WhatsAppContactCard[];
+}
+
+export class MarkAsReadDto {
+  @IsString()
+  @IsNotEmpty()
+  messageId!: string;
+
+  @IsOptional()
+  @IsIn(['sandbox', 'live'])
+  mode?: WhatsAppMode;
 }

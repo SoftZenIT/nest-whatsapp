@@ -1,24 +1,12 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { WhatsAppEvents } from './whatsapp.events';
-import { type WhatsAppStatusEvent, type WhatsAppTypedMessageEvent } from '../interfaces/events';
-import type { WhatsAppWebhookPayload } from '../interfaces/webhook.interfaces';
+import { type WhatsAppStatusEvent, type WhatsAppReferralEvent } from '../interfaces/events';
 import {
-  getAllValues,
-  isTextMessage,
-  isImageMessage,
-  isAudioMessage,
-  isDocumentMessage,
-  isLocationMessage,
-  isTemplateMessage,
-  isInteractiveMessage,
-  isContactsMessage,
-  isSystemMessage,
-  isOrderMessage,
-  isProductMessage,
-  isVideoMessage,
-  isStickerMessage,
-  isReactionMessage,
-} from '../utils/webhook';
+  WhatsAppMessageType,
+  type WhatsAppMessage,
+  type WhatsAppWebhookPayload,
+} from '../interfaces/webhook.interfaces';
+import { getAllValues } from '../utils/webhook';
 
 @Injectable()
 export class WhatsAppWebhookProcessor implements OnModuleInit, OnModuleDestroy {
@@ -47,48 +35,69 @@ export class WhatsAppWebhookProcessor implements OnModuleInit, OnModuleDestroy {
       }
 
       for (const msg of value.messages ?? []) {
-        if (isTextMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'text'> = { message: msg, contact, metadata };
-          this.events.emitTextReceived(ev);
-        } else if (isImageMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'image'> = { message: msg, contact, metadata };
-          this.events.emitImageReceived(ev);
-        } else if (isAudioMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'audio'> = { message: msg, contact, metadata };
-          this.events.emitAudioReceived(ev);
-        } else if (isDocumentMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'document'> = { message: msg, contact, metadata };
-          this.events.emitDocumentReceived(ev);
-        } else if (isLocationMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'location'> = { message: msg, contact, metadata };
-          this.events.emitLocationReceived(ev);
-        } else if (isTemplateMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'template'> = { message: msg, contact, metadata };
-          this.events.emitTemplateReceived(ev);
-        } else if (isInteractiveMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'interactive'> = { message: msg, contact, metadata };
-          this.events.emitInteractiveReceived(ev);
-        } else if (isContactsMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'contacts'> = { message: msg, contact, metadata };
-          this.events.emitContactsReceived(ev);
-        } else if (isSystemMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'system'> = { message: msg, contact, metadata };
-          this.events.emitSystemReceived(ev);
-        } else if (isOrderMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'order'> = { message: msg, contact, metadata };
-          this.events.emitOrderReceived(ev);
-        } else if (isProductMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'product'> = { message: msg, contact, metadata };
-          this.events.emitProductReceived(ev);
-        } else if (isVideoMessage(msg)) {
-          void msg; // no-op: path acknowledged
-        } else if (isStickerMessage(msg)) {
-          void msg; // no-op: path acknowledged
-        } else if (isReactionMessage(msg)) {
-          const ev: WhatsAppTypedMessageEvent<'reaction'> = { message: msg, contact, metadata };
-          this.events.emitReactionReceived(ev);
+        this.dispatchMessageEvent(msg, contact, metadata);
+
+        if (msg.referral) {
+          const referralEv: WhatsAppReferralEvent = {
+            message: msg,
+            referral: msg.referral,
+            contact,
+            metadata,
+          };
+          this.events.emitReferralReceived(referralEv);
         }
       }
+    }
+  }
+
+  private dispatchMessageEvent(
+    msg: WhatsAppMessage,
+    contact: WhatsAppStatusEvent['contact'],
+    metadata: WhatsAppStatusEvent['metadata']
+  ): void {
+    switch (msg.type) {
+      case WhatsAppMessageType.TEXT:
+        this.events.emitTextReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.IMAGE:
+        this.events.emitImageReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.AUDIO:
+        this.events.emitAudioReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.DOCUMENT:
+        this.events.emitDocumentReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.LOCATION:
+        this.events.emitLocationReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.TEMPLATE:
+        this.events.emitTemplateReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.INTERACTIVE:
+        this.events.emitInteractiveReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.CONTACTS:
+        this.events.emitContactsReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.SYSTEM:
+        this.events.emitSystemReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.ORDER:
+        this.events.emitOrderReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.PRODUCT:
+        this.events.emitProductReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.VIDEO:
+        this.events.emitVideoReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.STICKER:
+        this.events.emitStickerReceived({ message: msg, contact, metadata });
+        break;
+      case WhatsAppMessageType.REACTION:
+        this.events.emitReactionReceived({ message: msg, contact, metadata });
+        break;
     }
   }
 }

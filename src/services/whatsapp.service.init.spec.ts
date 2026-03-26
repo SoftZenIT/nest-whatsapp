@@ -1,9 +1,10 @@
 import { Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { WhatsAppService } from './whatsapp.service';
-import type {
-  WhatsAppLiveOptions,
-  WhatsAppSandboxOptions,
+import {
+  WhatsAppMode,
+  type WhatsAppLiveOptions,
+  type WhatsAppSandboxOptions,
 } from '../interfaces/whatsapp-client-options.interface';
 import { unsafeCast } from '../test-utils/type-helpers';
 
@@ -22,7 +23,7 @@ describe('WhatsAppService onModuleInit', () => {
 
   it('logs sandbox only', () => {
     const sandbox: WhatsAppSandboxOptions = {
-      mode: 'sandbox',
+      mode: WhatsAppMode.SANDBOX,
       testPhoneNumberId: 'id',
       temporaryAccessToken: 'tok',
       testRecipients: [],
@@ -34,7 +35,7 @@ describe('WhatsAppService onModuleInit', () => {
 
   it('logs live only', () => {
     const live: WhatsAppLiveOptions = {
-      mode: 'live',
+      mode: WhatsAppMode.LIVE,
       businessAccountId: 'b',
       phoneNumberId: 'p',
       accessToken: 't',

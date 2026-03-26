@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import whatsappConfig, { WhatsappConfigSchema } from './whatsapp.config';
-import { WhatsAppModule } from 'nest-whatsapp';
+import { WhatsAppModule, WhatsAppModule as WhatsAppMicroServiceModule } from 'nest-whatsapp';
 import { HealthController } from './health.controller';
 import { WaEventsLogger } from './wa-events.logger';
 import { WaMicroClientService } from './wa-micro-client.service';
@@ -9,7 +9,6 @@ import { TerminusModule } from '@nestjs/terminus';
 import { WhatsAppController } from './whatsapp.controller';
 import { MetricsController } from './metrics.controller';
 import { WaMicroController } from './wa-micro.controller';
-import { WhatsAppModule as WA } from 'nest-whatsapp';
 
 @Module({
   imports: [
@@ -43,7 +42,7 @@ import { WhatsAppModule as WA } from 'nest-whatsapp';
       },
     }),
     // TCP client to talk to the microservice example
-    WA.forMicroservice({
+    WhatsAppMicroServiceModule.forMicroservice({
       host: process.env.WHATSAPP_MICROSERVICE_HOST || '127.0.0.1',
       port: +(process.env.WHATSAPP_MICROSERVICE_PORT || 4000),
       clientName: 'WA_CLIENT',

@@ -44,7 +44,7 @@ export class WhatsAppHealthIndicator {
         message: 'External check disabled via WHATSAPP_HEALTH_SKIP_EXTERNAL',
       });
     }
-    const version = this.runtimeOptions?.apiVersion ?? 'v17.0';
+    const version = this.runtimeOptions?.apiVersion ?? 'v25.0';
     const url = `https://graph.facebook.com/${version}`;
     try {
       await firstValueFrom(

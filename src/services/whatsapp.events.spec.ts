@@ -150,5 +150,56 @@ describe('WhatsAppEvents facade', () => {
         contact: { wa_id: '1' },
       },
     });
+    runCase({
+      on: events.onVideoReceived.bind(events),
+      off: events.offVideoReceived.bind(events),
+      emit: events.emitVideoReceived.bind(events),
+      payload: {
+        message: { type: 'video', video: { id: 'vid-1', mime_type: 'video/mp4' } },
+        contact: { wa_id: '1' },
+      },
+    });
+    runCase({
+      on: events.onStickerReceived.bind(events),
+      off: events.offStickerReceived.bind(events),
+      emit: events.emitStickerReceived.bind(events),
+      payload: {
+        message: {
+          type: 'sticker',
+          sticker: { id: 'stk-1', mime_type: 'image/webp', animated: false },
+        },
+        contact: { wa_id: '1' },
+      },
+    });
+  });
+
+  it('referral event on/emit/off', () => {
+    const payload = {
+      referral: {
+        source_url: 'https://fb.com/ad/123',
+        source_type: 'ad' as const,
+        source_id: 'ad-id-1',
+        headline: 'Test Ad',
+        body: 'Ad body',
+        media_type: 'image' as const,
+        image_url: 'https://example.com/img.jpg',
+        ctwa_clid: 'clid-abc',
+      },
+      message: {
+        id: 'msg-1',
+        from: '+1234',
+        timestamp: '1234567890',
+        type: 'text' as const,
+        text: { body: 'hi' },
+      },
+      contact: { wa_id: '+1234' },
+    };
+    const spy = jest.fn();
+    events.onReferralReceived(spy);
+    events.emitReferralReceived(payload);
+    expect(spy).toHaveBeenCalledWith(payload);
+    events.offReferralReceived(spy);
+    events.emitReferralReceived(payload);
+    expect(spy).toHaveBeenCalledTimes(1);
   });
 });

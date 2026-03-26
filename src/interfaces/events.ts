@@ -4,6 +4,7 @@ import type {
   WhatsAppStatus,
   WhatsAppContact,
   WhatsAppMetadata,
+  WhatsAppReferral,
 } from './webhook.interfaces';
 
 export const WHATSAPP_MESSAGE_RECEIVED = 'whatsapp.message_received' as const;
@@ -20,6 +21,9 @@ export const WHATSAPP_SYSTEM_RECEIVED = 'whatsapp.system_received' as const;
 export const WHATSAPP_ORDER_RECEIVED = 'whatsapp.order_received' as const;
 export const WHATSAPP_PRODUCT_RECEIVED = 'whatsapp.product_received' as const;
 export const WHATSAPP_REACTION_RECEIVED = 'whatsapp.reaction_received' as const;
+export const WHATSAPP_VIDEO_RECEIVED = 'whatsapp.video_received' as const;
+export const WHATSAPP_STICKER_RECEIVED = 'whatsapp.sticker_received' as const;
+export const WHATSAPP_REFERRAL_RECEIVED = 'whatsapp.referral_received' as const;
 
 export type WhatsAppMessageReceivedEvent = WhatsAppWebhookPayload;
 
@@ -32,9 +36,16 @@ export interface WhatsAppStatusEvent extends BaseMessageEvent {
   status: WhatsAppStatus;
 }
 
-export interface WhatsAppTypedMessageEvent<T extends WhatsAppMessage['type']>
-  extends BaseMessageEvent {
+export interface WhatsAppTypedMessageEvent<
+  T extends WhatsAppMessage['type'],
+> extends BaseMessageEvent {
   message: Extract<WhatsAppMessage, { type: T }>;
+}
+
+/** Emitted when an inbound message originated from a Click-to-WhatsApp ad. */
+export interface WhatsAppReferralEvent extends BaseMessageEvent {
+  message: WhatsAppMessage;
+  referral: WhatsAppReferral;
 }
 
 export type WhatsAppEventMap = {
@@ -52,6 +63,9 @@ export type WhatsAppEventMap = {
   [WHATSAPP_ORDER_RECEIVED]: WhatsAppTypedMessageEvent<'order'>;
   [WHATSAPP_PRODUCT_RECEIVED]: WhatsAppTypedMessageEvent<'product'>;
   [WHATSAPP_REACTION_RECEIVED]: WhatsAppTypedMessageEvent<'reaction'>;
+  [WHATSAPP_VIDEO_RECEIVED]: WhatsAppTypedMessageEvent<'video'>;
+  [WHATSAPP_STICKER_RECEIVED]: WhatsAppTypedMessageEvent<'sticker'>;
+  [WHATSAPP_REFERRAL_RECEIVED]: WhatsAppReferralEvent;
 };
 
 // Normalized sub-events

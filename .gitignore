@@ -27,6 +27,7 @@ coverage/
 .vscode/
 .husky/
 docs/
+!docs/guides/
 schematics/dist/
 *.tgz
 firebase-debug.log

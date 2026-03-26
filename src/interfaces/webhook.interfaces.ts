@@ -1,4 +1,7 @@
-export type HubMode = 'subscribe' | string;
+export type HubMode = 'subscribe';
+
+/** Identifies a media asset by either a hosted URL or an uploaded media ID. */
+export type WhatsAppMediaSource = { url: string } | { mediaId: string };
 
 export interface VerifyWebhookQuery {
   'hub.mode'?: HubMode;
@@ -96,31 +99,80 @@ export interface WhatsAppReaction {
   action?: 'react' | 'unreact';
 }
 
+/** Referral data present when a message originates from a Click-to-WhatsApp ad. */
+export interface WhatsAppReferral {
+  sourceUrl?: string;
+  sourceId?: string;
+  sourceType?: 'ad' | 'post';
+  headline?: string;
+  body?: string;
+  mediaType?: 'image' | 'video';
+  mediaUrl?: string;
+  ctwaClid?: string;
+}
+
+/** Typed constants for all WhatsApp message type discriminants. */
+export enum WhatsAppMessageType {
+  TEXT = 'text',
+  IMAGE = 'image',
+  AUDIO = 'audio',
+  DOCUMENT = 'document',
+  LOCATION = 'location',
+  VIDEO = 'video',
+  STICKER = 'sticker',
+  TEMPLATE = 'template',
+  INTERACTIVE = 'interactive',
+  CONTACTS = 'contacts',
+  SYSTEM = 'system',
+  ORDER = 'order',
+  PRODUCT = 'product',
+  REACTION = 'reaction',
+}
+
 export type WhatsAppMessageBase = {
   id?: string;
   from?: string;
   timestamp?: string;
   context?: WhatsAppContext;
+  referral?: WhatsAppReferral;
 };
 
 export type WhatsAppMessage =
-  | (WhatsAppMessageBase & { type: 'text'; text: WhatsAppText })
-  | (WhatsAppMessageBase & { type: 'image'; image: WhatsAppImage })
-  | (WhatsAppMessageBase & { type: 'audio'; audio: WhatsAppAudio })
-  | (WhatsAppMessageBase & { type: 'document'; document: WhatsAppDocument })
-  | (WhatsAppMessageBase & { type: 'location'; location: WhatsAppLocation })
-  | (WhatsAppMessageBase & { type: 'video'; video: WhatsAppVideo })
-  | (WhatsAppMessageBase & { type: 'sticker'; sticker: WhatsAppSticker })
+  | (WhatsAppMessageBase & { type: WhatsAppMessageType.TEXT; text: WhatsAppText })
+  | (WhatsAppMessageBase & { type: WhatsAppMessageType.IMAGE; image: WhatsAppImage })
+  | (WhatsAppMessageBase & { type: WhatsAppMessageType.AUDIO; audio: WhatsAppAudio })
   | (WhatsAppMessageBase & {
-      type: 'template';
+      type: WhatsAppMessageType.DOCUMENT;
+      document: WhatsAppDocument;
+    })
+  | (WhatsAppMessageBase & {
+      type: WhatsAppMessageType.LOCATION;
+      location: WhatsAppLocation;
+    })
+  | (WhatsAppMessageBase & { type: WhatsAppMessageType.VIDEO; video: WhatsAppVideo })
+  | (WhatsAppMessageBase & { type: WhatsAppMessageType.STICKER; sticker: WhatsAppSticker })
+  | (WhatsAppMessageBase & {
+      type: WhatsAppMessageType.TEMPLATE;
       template: { name: string; language?: { code: string } };
     })
-  | (WhatsAppMessageBase & { type: 'interactive'; interactive: WhatsAppInteractive })
-  | (WhatsAppMessageBase & { type: 'contacts'; contacts: WhatsAppContactCard[] })
-  | (WhatsAppMessageBase & { type: 'system'; system: WhatsAppSystemPayload })
-  | (WhatsAppMessageBase & { type: 'order'; order: WhatsAppOrder })
-  | (WhatsAppMessageBase & { type: 'product'; product: WhatsAppProduct })
-  | (WhatsAppMessageBase & { type: 'reaction'; reaction: WhatsAppReaction });
+  | (WhatsAppMessageBase & {
+      type: WhatsAppMessageType.INTERACTIVE;
+      interactive: WhatsAppInteractive;
+    })
+  | (WhatsAppMessageBase & {
+      type: WhatsAppMessageType.CONTACTS;
+      contacts: WhatsAppContactCard[];
+    })
+  | (WhatsAppMessageBase & {
+      type: WhatsAppMessageType.SYSTEM;
+      system: WhatsAppSystemPayload;
+    })
+  | (WhatsAppMessageBase & { type: WhatsAppMessageType.ORDER; order: WhatsAppOrder })
+  | (WhatsAppMessageBase & { type: WhatsAppMessageType.PRODUCT; product: WhatsAppProduct })
+  | (WhatsAppMessageBase & {
+      type: WhatsAppMessageType.REACTION;
+      reaction: WhatsAppReaction;
+    });
 
 export interface WhatsAppMetadata {
   phone_number_id?: string;
@@ -166,7 +218,7 @@ export interface RawBodyRequestLike<TBody, TQuery> {
 export type WhatsAppOutboundPayload = {
   messaging_product: 'whatsapp';
   to: string;
-  type: string;
+  type: WhatsAppMessageType;
   context?: { message_id: string };
   [key: string]: unknown;
 };

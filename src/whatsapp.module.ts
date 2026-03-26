@@ -1,8 +1,17 @@
-import { DynamicModule, Provider, Logger, type InjectionToken } from '@nestjs/common';
-import type { ModuleMetadata, OptionalFactoryDependency } from '@nestjs/common';
+import {
+  DynamicModule,
+  Provider,
+  Logger,
+  type InjectionToken,
+  type ModuleMetadata,
+  type OptionalFactoryDependency,
+} from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { WhatsAppService } from './services/whatsapp.service';
-import { WhatsAppClientOptions } from './interfaces/whatsapp-client-options.interface';
+import {
+  WhatsAppClientOptions,
+  WhatsAppMode,
+} from './interfaces/whatsapp-client-options.interface';
 import { WhatsAppMetricsService } from './services/whatsapp.metrics';
 import { WhatsAppMicroserviceOptions } from './interfaces/whatsapp-microservice-options.interface';
 import {
@@ -12,23 +21,32 @@ import {
 } from './services/whatsapp.events';
 import { WhatsAppWebhookProcessor } from './services/whatsapp.webhook-processor';
 import { WhatsAppController } from './controllers/whatsapp.controller';
-import type { EventEmitter } from 'events';
+import type { EventEmitter } from 'node:events';
 import {
   WHATSAPP_RUNTIME_OPTIONS,
   type WhatsAppRuntimeOptions,
 } from './interfaces/whatsapp-runtime-options.interface';
+import { WhatsAppMediaService } from './services/whatsapp.media.service';
+import { WhatsAppTemplatesService } from './services/whatsapp.templates.service';
+import { WhatsAppPhoneNumbersService } from './services/whatsapp.phone-numbers.service';
 
 const ASYNC_CLIENTS_TOKEN = 'WHATSAPP_MODULE_ASYNC_CLIENTS';
-const KNOWN_CLIENT_MODES: WhatsAppClientOptions['mode'][] = ['sandbox', 'live'];
+const KNOWN_CLIENT_MODES: WhatsAppClientOptions['mode'][] = [
+  WhatsAppMode.SANDBOX,
+  WhatsAppMode.LIVE,
+];
 
 type AsyncFactoryResult =
   | WhatsAppClientOptions
   | WhatsAppClientOptions[]
   | Promise<WhatsAppClientOptions | WhatsAppClientOptions[]>;
 
-export interface WhatsAppModuleAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
+export interface WhatsAppModuleAsyncOptions<TDeps extends unknown[] = unknown[]> extends Pick<
+  ModuleMetadata,
+  'imports'
+> {
   inject?: (InjectionToken | OptionalFactoryDependency)[];
-  useFactory: (...args: unknown[]) => AsyncFactoryResult;
+  useFactory: (...args: TDeps) => AsyncFactoryResult;
 }
 
 const eventEmitterProvider: Provider = {
@@ -46,7 +64,7 @@ function createEventEmitterInstance(): WhatsAppEventEmitter {
   if (emitterCtor) {
     return new emitterCtor();
   }
-  const { EventEmitter } = require('events') as { EventEmitter: new () => EventEmitter };
+  const { EventEmitter } = require('node:events') as { EventEmitter: new () => EventEmitter };
   const emitter = new EventEmitter() as EventEmitter & Partial<WhatsAppEventEmitter>;
   if (typeof emitter.off !== 'function' && typeof emitter.removeListener === 'function') {
     emitter.off = emitter.removeListener.bind(emitter);
@@ -56,7 +74,7 @@ function createEventEmitterInstance(): WhatsAppEventEmitter {
 
 function resolveRuntimeOptions(): WhatsAppRuntimeOptions {
   return {
-    apiVersion: process.env.WHATSAPP_GRAPH_API_VERSION ?? 'v17.0',
+    apiVersion: process.env.WHATSAPP_GRAPH_API_VERSION ?? 'v25.0',
     httpTimeoutMs: Number(process.env.WHATSAPP_HTTP_TIMEOUT_MS ?? '10000'),
     httpRetries: Number(process.env.WHATSAPP_HTTP_RETRIES ?? '2'),
     httpMaxRetryDelayMs: Number(process.env.WHATSAPP_HTTP_MAX_RETRY_DELAY_MS ?? '5000'),
@@ -109,21 +127,35 @@ export class WhatsAppModule {
         WhatsAppMetricsService,
         WhatsAppEvents,
         WhatsAppWebhookProcessor,
+        WhatsAppMediaService,
+        WhatsAppTemplatesService,
+        WhatsAppPhoneNumbersService,
       ],
-      exports: [WhatsAppService, WhatsAppMetricsService, WhatsAppEvents],
+      exports: [
+        WhatsAppService,
+        WhatsAppMetricsService,
+        WhatsAppEvents,
+        WhatsAppMediaService,
+        WhatsAppTemplatesService,
+        WhatsAppPhoneNumbersService,
+      ],
     };
   }
 
-  static forRootAsync(options: WhatsAppModuleAsyncOptions): DynamicModule {
+  static forRootAsync<TDeps extends unknown[] = unknown[]>(
+    options: WhatsAppModuleAsyncOptions<TDeps>
+  ): DynamicModule {
     if (typeof options?.useFactory !== 'function') {
-      throw new Error('WhatsAppModule.forRootAsync requires a useFactory function');
+      throw new TypeError('WhatsAppModule.forRootAsync requires a useFactory function');
     }
 
     const asyncClientsProvider: Provider = {
       provide: ASYNC_CLIENTS_TOKEN,
       inject: options.inject ?? [],
       useFactory: async (...args: unknown[]) => {
-        const result = await options.useFactory(...args);
+        const result = await (options.useFactory as (...a: unknown[]) => AsyncFactoryResult)(
+          ...args
+        );
         const clients = Array.isArray(result) ? result : [result];
         return clients;
       },
@@ -149,8 +181,18 @@ export class WhatsAppModule {
         WhatsAppMetricsService,
         WhatsAppEvents,
         WhatsAppWebhookProcessor,
+        WhatsAppMediaService,
+        WhatsAppTemplatesService,
+        WhatsAppPhoneNumbersService,
       ],
-      exports: [WhatsAppService, WhatsAppMetricsService, WhatsAppEvents],
+      exports: [
+        WhatsAppService,
+        WhatsAppMetricsService,
+        WhatsAppEvents,
+        WhatsAppMediaService,
+        WhatsAppTemplatesService,
+        WhatsAppPhoneNumbersService,
+      ],
     };
   }
 
@@ -187,8 +229,19 @@ export class WhatsAppModule {
         WhatsAppMetricsService,
         WhatsAppEvents,
         WhatsAppWebhookProcessor,
+        WhatsAppMediaService,
+        WhatsAppTemplatesService,
+        WhatsAppPhoneNumbersService,
       ],
-      exports: [WhatsAppService, WhatsAppMetricsService, WhatsAppEvents, ClientsModule],
+      exports: [
+        WhatsAppService,
+        WhatsAppMetricsService,
+        WhatsAppEvents,
+        WhatsAppMediaService,
+        WhatsAppTemplatesService,
+        WhatsAppPhoneNumbersService,
+        ClientsModule,
+      ],
     };
   }
 
@@ -199,8 +252,18 @@ export class WhatsAppModule {
     return {
       module: WhatsAppModule,
       imports: [createHttpModule()],
-      providers: [WhatsAppHealthIndicator],
-      exports: [WhatsAppHealthIndicator],
+      providers: [
+        WhatsAppHealthIndicator,
+        WhatsAppMediaService,
+        WhatsAppTemplatesService,
+        WhatsAppPhoneNumbersService,
+      ],
+      exports: [
+        WhatsAppHealthIndicator,
+        WhatsAppMediaService,
+        WhatsAppTemplatesService,
+        WhatsAppPhoneNumbersService,
+      ],
     };
   }
 }
