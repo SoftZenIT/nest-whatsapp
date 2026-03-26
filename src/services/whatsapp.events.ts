@@ -14,9 +14,13 @@ import {
   WHATSAPP_ORDER_RECEIVED,
   WHATSAPP_PRODUCT_RECEIVED,
   WHATSAPP_REACTION_RECEIVED,
+  WHATSAPP_VIDEO_RECEIVED,
+  WHATSAPP_STICKER_RECEIVED,
+  WHATSAPP_REFERRAL_RECEIVED,
   type WhatsAppMessageReceivedEvent,
   type WhatsAppStatusEvent,
   type WhatsAppTypedMessageEvent,
+  type WhatsAppReferralEvent,
   type WhatsAppEventMap,
 } from '../interfaces/events';
 
@@ -189,5 +193,35 @@ export class WhatsAppEvents {
   }
   offReactionReceived(listener: (payload: WhatsAppTypedMessageEvent<'reaction'>) => void): void {
     this.typedEmitter.off(WHATSAPP_REACTION_RECEIVED, listener);
+  }
+
+  emitVideoReceived(payload: WhatsAppTypedMessageEvent<'video'>): boolean {
+    return this.typedEmitter.emit(WHATSAPP_VIDEO_RECEIVED, payload);
+  }
+  onVideoReceived(listener: (payload: WhatsAppTypedMessageEvent<'video'>) => void): void {
+    this.typedEmitter.on(WHATSAPP_VIDEO_RECEIVED, listener);
+  }
+  offVideoReceived(listener: (payload: WhatsAppTypedMessageEvent<'video'>) => void): void {
+    this.typedEmitter.off(WHATSAPP_VIDEO_RECEIVED, listener);
+  }
+
+  emitStickerReceived(payload: WhatsAppTypedMessageEvent<'sticker'>): boolean {
+    return this.typedEmitter.emit(WHATSAPP_STICKER_RECEIVED, payload);
+  }
+  onStickerReceived(listener: (payload: WhatsAppTypedMessageEvent<'sticker'>) => void): void {
+    this.typedEmitter.on(WHATSAPP_STICKER_RECEIVED, listener);
+  }
+  offStickerReceived(listener: (payload: WhatsAppTypedMessageEvent<'sticker'>) => void): void {
+    this.typedEmitter.off(WHATSAPP_STICKER_RECEIVED, listener);
+  }
+
+  emitReferralReceived(payload: WhatsAppReferralEvent): boolean {
+    return this.typedEmitter.emit(WHATSAPP_REFERRAL_RECEIVED, payload);
+  }
+  onReferralReceived(listener: (payload: WhatsAppReferralEvent) => void): void {
+    this.typedEmitter.on(WHATSAPP_REFERRAL_RECEIVED, listener);
+  }
+  offReferralReceived(listener: (payload: WhatsAppReferralEvent) => void): void {
+    this.typedEmitter.off(WHATSAPP_REFERRAL_RECEIVED, listener);
   }
 }

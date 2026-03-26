@@ -8,11 +8,13 @@ NestJS module for seamless integration with the WhatsApp Cloud API, supporting s
 
 ## Features
 
-- Send text, image, audio, document, location, and template messages
+- Send **12 message types**: text, image, audio, document, location, template, video, sticker, reaction, interactive, contact card, and mark-as-read — with optional reply threading
+- **Media-by-ID**: all media methods accept a URL string or `WhatsAppMediaSource` (`{ url }` / `{ mediaId }`)
 - Session management helpers (`startSession`, `endSession`)
 - Sandbox mode for rapid testing
 - Live mode for production with template enforcement and rate limits
-- Webhook verification & event emitting
+- Webhook verification & typed event emitting — including `video`, `sticker`, and referral (Click-to-WhatsApp) events
+- **Management APIs**: `WhatsAppMediaService`, `WhatsAppTemplatesService`, `WhatsAppPhoneNumbersService`
 - Nest microservice transport (TCP)
 - Prometheus metrics and Nest Terminus health indicator
 - Full TypeScript support (CJS & ESM)

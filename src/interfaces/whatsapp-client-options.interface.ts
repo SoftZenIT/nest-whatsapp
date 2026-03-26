@@ -1,18 +1,24 @@
 import type { AxiosRequestConfig } from 'axios';
 
-export type WhatsAppMode = 'sandbox' | 'live';
+export enum WhatsAppMode {
+  SANDBOX = 'sandbox',
+  LIVE = 'live',
+}
+
 export interface WhatsAppSandboxOptions {
-  mode: 'sandbox';
+  mode: WhatsAppMode.SANDBOX;
   testPhoneNumberId: string;
   temporaryAccessToken: string;
   testRecipients: string[];
   httpConfig?: AxiosRequestConfig;
 }
+
 export interface WhatsAppLiveOptions {
-  mode: 'live';
+  mode: WhatsAppMode.LIVE;
   businessAccountId: string;
   phoneNumberId: string;
   accessToken: string;
   httpConfig?: AxiosRequestConfig;
 }
+
 export type WhatsAppClientOptions = WhatsAppSandboxOptions | WhatsAppLiveOptions;

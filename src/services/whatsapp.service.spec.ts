@@ -4,19 +4,20 @@ import { of, throwError } from 'rxjs';
 import { asHttpPostReturn } from '../test-utils/http-helpers';
 import { WhatsAppService } from './whatsapp.service';
 import {
+  WhatsAppMode,
   WhatsAppSandboxOptions,
   WhatsAppLiveOptions,
 } from '../interfaces/whatsapp-client-options.interface';
 
 const sandboxConfig: WhatsAppSandboxOptions = {
-  mode: 'sandbox',
+  mode: WhatsAppMode.SANDBOX,
   testPhoneNumberId: '123',
   temporaryAccessToken: 'sandbox-token',
   testRecipients: ['+10000000000', '+111', '+200', '+333', '+555'],
 };
 
 const liveConfig: WhatsAppLiveOptions = {
-  mode: 'live',
+  mode: WhatsAppMode.LIVE,
   businessAccountId: 'abc',
   phoneNumberId: '456',
   accessToken: 'live-token',
@@ -41,9 +42,11 @@ describe('WhatsAppService', () => {
 
   it('should send text in live mode', async () => {
     jest.spyOn(httpService, 'post').mockReturnValue(of({ data: { messages: [{ id: 'msg-id' }] } }));
-    await expect(service.sendText('+100', 'hello', 'live')).resolves.toEqual(expect.any(String));
+    await expect(service.sendText('+100', 'hello', WhatsAppMode.LIVE)).resolves.toEqual(
+      expect.any(String)
+    );
     expect(httpService.post).toHaveBeenCalledWith(
-      'https://graph.facebook.com/v17.0/456/messages',
+      'https://graph.facebook.com/v25.0/456/messages',
       { messaging_product: 'whatsapp', to: '+100', type: 'text', text: { body: 'hello' } },
       expect.objectContaining({ headers: { Authorization: 'Bearer live-token' } })
     );
@@ -53,13 +56,13 @@ describe('WhatsAppService', () => {
     jest
       .spyOn(httpService, 'post')
       .mockReturnValue(of({ data: { messages: [{ id: 'wamid.abc123' }] } }));
-    const id = await service.sendText('+100', 'hello', 'live');
+    const id = await service.sendText('+100', 'hello', WhatsAppMode.LIVE);
     expect(id).toBe('wamid.abc123');
   });
 
   it('includes context when replyToMessageId provided', async () => {
     jest.spyOn(httpService, 'post').mockReturnValue(of({ data: { messages: [{ id: 'msg-id' }] } }));
-    await service.sendText('+100', 'reply', 'live', 'original-msg-id');
+    await service.sendText('+100', 'reply', WhatsAppMode.LIVE, 'original-msg-id');
     expect(httpService.post).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({ context: { message_id: 'original-msg-id' } }),
@@ -69,11 +72,11 @@ describe('WhatsAppService', () => {
 
   it('should send media in sandbox mode', async () => {
     jest.spyOn(httpService, 'post').mockReturnValue(of({ data: { messages: [{ id: 'msg-id' }] } }));
-    await expect(service.sendMedia('+200', 'http://media', 'caption', 'sandbox')).resolves.toEqual(
-      expect.any(String)
-    );
+    await expect(
+      service.sendMedia('+200', 'http://media', 'caption', WhatsAppMode.SANDBOX)
+    ).resolves.toEqual(expect.any(String));
     expect(httpService.post).toHaveBeenCalledWith(
-      'https://graph.facebook.com/v17.0/123/messages',
+      'https://graph.facebook.com/v25.0/123/messages',
       {
         messaging_product: 'whatsapp',
         to: '+200',
@@ -123,14 +126,18 @@ describe('WhatsAppService', () => {
       { ...sandboxConfig, testRecipients: [] },
       liveConfig
     );
-    await expect(svc.sendText('+10000000001', 'hello', 'sandbox')).rejects.toMatchObject({
-      name: 'WhatsAppSandboxRecipientException',
-    });
+    await expect(svc.sendText('+10000000001', 'hello', WhatsAppMode.SANDBOX)).rejects.toMatchObject(
+      {
+        name: 'WhatsAppSandboxRecipientException',
+      }
+    );
   });
 
   it('rejects sandbox recipients outside allow-list', async () => {
     jest.spyOn(httpService, 'post').mockReturnValue(of({ data: { messages: [{ id: 'msg-id' }] } }));
-    await expect(service.sendText('+19999999999', 'blocked', 'sandbox')).rejects.toMatchObject({
+    await expect(
+      service.sendText('+19999999999', 'blocked', WhatsAppMode.SANDBOX)
+    ).rejects.toMatchObject({
       name: 'WhatsAppSandboxRecipientException',
     });
   });

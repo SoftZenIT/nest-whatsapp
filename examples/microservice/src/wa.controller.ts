@@ -3,6 +3,8 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { WhatsAppService } from 'nest-whatsapp';
 import type { WhatsAppMode } from '../../../src/interfaces/whatsapp-client-options.interface';
 import {
+  MarkAsReadDto,
+  SendContactDto,
   SendDocumentDto,
   SendLocationDto,
   SendMediaDto,
@@ -58,6 +60,22 @@ export class WaController {
       data.address,
       mode
     );
+    return { ok: true };
+  }
+
+  @MessagePattern('wa.sendContact')
+  async sendContact(@Payload() data: SendContactDto) {
+    const mode: WhatsAppMode =
+      data.mode ?? (process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live');
+    await this.wa.sendContact(data.to, data.contacts, mode);
+    return { ok: true };
+  }
+
+  @MessagePattern('wa.markAsRead')
+  async markAsRead(@Payload() data: MarkAsReadDto) {
+    const mode: WhatsAppMode =
+      data.mode ?? (process.env.WHATSAPP_MODE === 'sandbox' ? 'sandbox' : 'live');
+    await this.wa.markAsRead(data.messageId, mode);
     return { ok: true };
   }
 }
