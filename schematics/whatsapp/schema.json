@@ -13,7 +13,7 @@
     "addHealth": { "type": "boolean", "default": false },
     "addMicro": { "type": "boolean", "default": false },
     "host": { "type": "string", "default": "127.0.0.1" },
-    "port": { "type": "number", "default": 4000 },
+    "port": { "type": "number", "default": 4455 },
     "testPhoneNumberId": { "type": "string" },
     "temporaryAccessToken": { "type": "string" },
     "testRecipients": { "type": "array", "items": { "type": "string" } },

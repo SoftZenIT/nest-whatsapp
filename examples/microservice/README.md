@@ -4,15 +4,16 @@ A NestJS microservice using `nest-whatsapp` TCP client.
 
 ## Setup
 
-- Copy env: `cp .env.example .env`
+- Copy env: `cp .env.example .env` and fill in values
 - Install deps: `npm install`
 - Start: `npm start`
+- Watch mode (auto-restart on change): `npm run start:dev`
 - Run demo client (requires service running): `npm run demo`
 
 ## Environment
 
 - `WHATSAPP_MICROSERVICE_HOST=127.0.0.1`
-- `WHATSAPP_MICROSERVICE_PORT=4000`
+- `WHATSAPP_MICROSERVICE_PORT=4455`
 - `WHATSAPP_MODE=sandbox|live`
 - Sandbox:
   - `WHATSAPP_SANDBOX_PHONE_NUMBER_ID=...`

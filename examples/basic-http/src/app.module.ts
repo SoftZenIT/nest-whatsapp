@@ -51,7 +51,7 @@ import { WaMicroController } from './wa-micro.controller';
     // TCP client to talk to the microservice example
     WhatsAppMicroServiceModule.forMicroservice({
       host: process.env.WHATSAPP_MICROSERVICE_HOST || '127.0.0.1',
-      port: +(process.env.WHATSAPP_MICROSERVICE_PORT || 4000),
+      port: +(process.env.WHATSAPP_MICROSERVICE_PORT || 4455),
       clientName: 'WA_CLIENT',
     }),
   ],

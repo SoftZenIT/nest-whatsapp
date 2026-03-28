@@ -7,7 +7,7 @@ async function run() {
     transport: Transport.TCP,
     options: {
       host: process.env.WHATSAPP_MICROSERVICE_HOST || '127.0.0.1',
-      port: +(process.env.WHATSAPP_MICROSERVICE_PORT || 4000),
+      port: +(process.env.WHATSAPP_MICROSERVICE_PORT || 4455),
     },
   });
   await client.connect();

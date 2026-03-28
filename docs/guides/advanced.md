@@ -144,7 +144,7 @@ import { WhatsAppModule } from 'nest-whatsapp';
   imports: [
     WhatsAppModule.forMicroservice({
       host: '127.0.0.1',
-      port: 4000,
+      port: 4455,
       clientName: 'WA_CLIENT', // optional, defaults to 'WHATSAPP_MICROSERVICE'
     }),
   ],
@@ -313,7 +313,7 @@ npx schematics nest-whatsapp:whatsapp \
   --add-health \
   --add-micro \
   --host=127.0.0.1 \
-  --port=4000
+  --port=4455
 
 # Live configuration
 npx schematics nest-whatsapp:whatsapp \

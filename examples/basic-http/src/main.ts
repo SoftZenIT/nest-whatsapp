@@ -7,7 +7,13 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
 async function bootstrap() {
+  // Disable the built-in body parser so the custom one below (with rawBody capture) is the only one.
   const app = await NestFactory.create(AppModule);
+  // Trust reverse proxy hops (e.g. tunnel) only when TRUST_PROXY_HOPS is explicitly set.
+  // Leave unset when running locally without a proxy.
+  if (process.env.TRUST_PROXY_HOPS) {
+    app.getHttpAdapter().getInstance().set('trust proxy', Number(process.env.TRUST_PROXY_HOPS));
+  }
   // Security: HTTP headers
   app.use(helmet());
   // Security: disable Express signature
@@ -33,7 +39,8 @@ async function bootstrap() {
       },
     })
   );
-  await app.listen(3000);
-  console.log('Basic HTTP example running on http://localhost:3000');
+  const port = Number(process.env.PORT ?? '3344');
+  await app.listen(port);
+  console.log(`Basic HTTP example running on http://localhost:${port}`);
 }
 bootstrap();
