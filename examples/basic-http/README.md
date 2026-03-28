@@ -4,11 +4,18 @@ A minimal NestJS app using `nest-whatsapp` over HTTP.
 
 ## Setup
 
-- Copy env: `cp .env.example .env`
+- Copy env: `cp .env.example .env` and fill in values
 - Install deps: `npm install`
 - Start: `npm start`
+- Watch mode (auto-restart on change): `npm run start:dev`
+- Debug mode (attach VS Code debugger): `npm run start:debug`
 
 ## Environment
+
+Required for webhook signature verification:
+
+- `WHATSAPP_APP_SECRET` — from Meta App Dashboard → App Settings → App Secret
+- `WHATSAPP_WEBHOOK_VERIFY_TOKEN` — any secret string you set in the Meta webhook config
 
 Set either sandbox or live mode:
 
@@ -26,9 +33,14 @@ Live:
 - `WHATSAPP_LIVE_PHONE_NUMBER_ID=...`
 - `WHATSAPP_LIVE_ACCESS_TOKEN=...`
 
+Optional:
+
+- `PORT=3344` — HTTP port (default: `3344`)
+- `TRUST_PROXY_HOPS=1` — set when running behind a reverse proxy or tunnel (e.g. ngrok, Cloudflare Tunnel)
+
 ## Messaging API
 
-Base URL: `http://localhost:3000`
+Base URL: `http://localhost:3344`
 
 - Send text
   - `POST /messages/text` — body: `{ "to": "+1555...", "message": "Hello" }`
@@ -51,7 +63,7 @@ Base URL: `http://localhost:3000`
 This example also includes a TCP client to the microservice example. Ensure the microservice is running and env is set:
 
 - `WHATSAPP_MICROSERVICE_HOST=127.0.0.1`
-- `WHATSAPP_MICROSERVICE_PORT=4000`
+- `WHATSAPP_MICROSERVICE_PORT=4455`
 
 Endpoint:
 
@@ -60,7 +72,7 @@ Endpoint:
 Example:
 
 ```
-curl -X POST localhost:3000/micro/send-text \
+curl -X POST localhost:3344/micro/send-text \
   -H 'Content-Type: application/json' \
   -d '{"to":"+15551234567","message":"Hello from TCP"}'
 ```
@@ -68,8 +80,8 @@ curl -X POST localhost:3000/micro/send-text \
 Examples:
 
 ```
-curl -X POST localhost:3000/messages/text -H 'Content-Type: application/json' -d '{"to":"+15551234567","message":"Hello"}'
-curl -X POST localhost:3000/messages/media -H 'Content-Type: application/json' -d '{"to":"+15551234567","url":"https://picsum.photos/300","caption":"Hi"}'
+curl -X POST localhost:3344/messages/text -H 'Content-Type: application/json' -d '{"to":"+15551234567","message":"Hello"}'
+curl -X POST localhost:3344/messages/media -H 'Content-Type: application/json' -d '{"to":"+15551234567","url":"https://picsum.photos/300","caption":"Hi"}'
 ```
 
 ## Health
@@ -78,7 +90,7 @@ curl -X POST localhost:3000/messages/media -H 'Content-Type: application/json' -
 - Example:
 
 ```
-curl http://localhost:3000/health
+curl http://localhost:3344/health
 ```
 
 - Response (example):

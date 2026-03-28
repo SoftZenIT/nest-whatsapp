@@ -12,7 +12,7 @@ import {
 import { WhatsAppEvents } from '../services/whatsapp.events';
 import { ConfigService } from '@nestjs/config';
 import type { Request } from 'express';
-import * as crypto from 'crypto';
+import * as crypto from 'node:crypto';
 import type {
   VerifyWebhookQuery,
   WhatsAppWebhookPayload,

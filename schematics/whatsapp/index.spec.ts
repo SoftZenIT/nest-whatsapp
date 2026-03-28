@@ -21,7 +21,7 @@ describe('whatsapp schematic', () => {
       addHealth: true,
       addMicro: true,
       host: '127.0.0.1',
-      port: 4000,
+      port: 4455,
     });
     const tree = rule(createAppModule(), {} as any) as UnitTestTree;
     const content = tree.readContent('src/app.module.ts');
@@ -31,7 +31,7 @@ describe('whatsapp schematic', () => {
     expect(content).toContain("import { ConfigService } from '@nestjs/config'");
     expect(content).toContain("import { WhatsAppHealthModule } from 'nest-whatsapp/health'");
     expect(content).toContain('WhatsAppHealthModule');
-    expect(content).toContain("WhatsAppModule.forMicroservice({ host: '127.0.0.1', port: 4000 })");
+    expect(content).toContain("WhatsAppModule.forMicroservice({ host: '127.0.0.1', port: 4455 })");
     expect(content).toContain('WhatsAppModule.forRootAsync');
     expect(content).toContain('WhatsAppMode.SANDBOX');
   });
@@ -43,7 +43,7 @@ describe('whatsapp schematic', () => {
       addHealth: false,
       addMicro: false,
       host: '127.0.0.1',
-      port: 4000,
+      port: 4455,
       businessAccountId: 'b',
       phoneNumberId: 'p',
       accessToken: 't',
@@ -75,7 +75,7 @@ describe('whatsapp schematic', () => {
       addHealth: false,
       addMicro: false,
       host: '127.0.0.1',
-      port: 4000,
+      port: 4455,
       testPhoneNumberId: 'id',
       temporaryAccessToken: 'tok',
       testRecipients: ['+111', '+222'],

@@ -29,25 +29,28 @@ mounted** when you import `WhatsAppModule`. You do not need to create a controll
 ## Bootstrap Setup
 
 The webhook controller requires the **raw request body** to verify HMAC-SHA256 signatures.
-Configure your NestJS bootstrap file accordingly:
+Disable NestJS's built-in body parser and register your own with a `verify` callback so the raw
+buffer is captured before parsing:
 
 ```ts
 // main.ts
 import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { rawBody: true });
+  // Disable the built-in body parser so the custom one below (with rawBody capture) is the only one.
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
 
+  type RawBodyRequest = Request & { rawBody: Buffer };
   app.use(
     bodyParser.json({
       limit: '2mb',
-      verify: (req: any, _res, buf) => {
-        req.rawBody = buf;
+      verify: (req: any, _res, buf: Buffer) => {
+        (req as RawBodyRequest).rawBody = buf;
       },
     })
   );
 
-  await app.listen(3000);
+  await app.listen(3344);
 }
 bootstrap();
 ```

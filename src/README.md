@@ -99,23 +99,27 @@ export class OrderService {
 }
 ```
 
-### Webhook Controller
+### Receiving Webhook Events
+
+The webhook controller (`GET /whatsapp/webhook`, `POST /whatsapp/webhook`) is **automatically
+registered** by `WhatsAppModule` — you do not need to create one. Subscribe to events via
+`WhatsAppEvents` in your own service:
 
 ```ts
-import { Controller, Get, Post, Req, Headers } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { WhatsAppEvents } from 'nest-whatsapp';
 
-@Controller('whatsapp/webhook')
-export class WhatsAppController {
-  constructor(
-    private readonly events: WhatsAppEvents,
-    private readonly cs: ConfigService
-  ) {}
-  @Get() verify(@Req() r) {
-    /*...*/
-  }
-  @Post() receive(@Req() r, @Headers('x-hub-signature-256') sig) {
-    /*...*/
+@Injectable()
+export class MessageHandlerService implements OnModuleInit {
+  constructor(private readonly events: WhatsAppEvents) {}
+
+  onModuleInit(): void {
+    this.events.onTextReceived(({ message, contact }) => {
+      console.log(`Text from ${contact?.wa_id}: ${message.text.body}`);
+    });
+    this.events.onStatusReceived(({ status }) => {
+      console.log(`Status: ${status.id} → ${status.status}`);
+    });
   }
 }
 ```
@@ -126,7 +130,7 @@ export class WhatsAppController {
 
 ```ts
 @Module({
-  imports: [WhatsAppModule.forMicroservice({ host: 'localhost', port: 4000 })],
+  imports: [WhatsAppModule.forMicroservice({ host: 'localhost', port: 4455 })],
 })
 export class MicroAppModule {}
 ```
