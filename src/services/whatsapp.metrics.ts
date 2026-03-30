@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import type { WhatsAppMode } from '../interfaces/whatsapp-client-options.interface';
 import { Counter, Gauge, Histogram, collectDefaultMetrics, register } from 'prom-client';
 import type { WhatsAppMessageType } from '../interfaces/webhook.interfaces';
@@ -74,8 +74,12 @@ export class WhatsAppMetricsService {
     this.messagesSentCounter.labels({ type, mode }).inc();
   }
 
-  incrementErrors(type: WhatsAppMessageType, mode: WhatsAppMode, status: string): void {
-    this.errorsCounter.labels({ type, mode, status }).inc();
+  incrementErrors(
+    type: WhatsAppMessageType,
+    mode: WhatsAppMode,
+    status: HttpStatus | string
+  ): void {
+    this.errorsCounter.labels({ type, mode, status: String(status) }).inc();
   }
 
   incrementWebhookEvents(): void {
