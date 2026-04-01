@@ -18,6 +18,10 @@ jobs:
       - run: npm run build
       - run: npm run lint
       - run: npm run test:ci
+      - name: Upload coverage to Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Security audit
         run: npm audit --audit-level=critical
       - name: Pack dry run

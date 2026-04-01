@@ -21,4 +21,5 @@ module.exports = {
     ],
   },
   coverageProvider: 'v8',
+  coverageReporters: ['text', 'lcov'],
 };
