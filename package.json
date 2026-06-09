@@ -88,7 +88,7 @@
     "*.{json,md,yml,yaml}": "prettier --write"
   },
   "devDependencies": {
-    "@angular-devkit/core": "^21.2.3",
+    "@angular-devkit/core": "^22.0.0",
     "@angular-devkit/schematics": "^21.2.3",
     "@angular-devkit/schematics-cli": "^21.2.3",
     "@commitlint/cli": "^20.5.0",
