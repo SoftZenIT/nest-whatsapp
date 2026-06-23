@@ -102,7 +102,7 @@
     "@nestjs/microservices": "^11",
     "@nestjs/terminus": "^11",
     "@nestjs/testing": "^11",
-    "@schematics/angular": "^21.2.3",
+    "@schematics/angular": "^22.0.3",
     "@semantic-release/changelog": "^6.0.0",
     "@semantic-release/commit-analyzer": "^13.0.1",
     "@semantic-release/git": "^10.0.0",
